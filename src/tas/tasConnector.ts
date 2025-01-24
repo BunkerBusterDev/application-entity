@@ -3,37 +3,55 @@ import Logger from 'lib/logger';
 
 class TASConnector {
     private server: Net.Server;
-    private tasBuffer: Record<string, string> = {};
+    private socketBuffer: Record<string, Net.Socket>;
+    private tasBuffer: Record<string, string>;
 
     constructor() {
         this.server = Net.createServer((socket: Net.Socket): void => {
-            Logger.info('[TASConnector-initialize]: TAS connected');
+            Logger.info('[TASConnector-constructor]: TAS connected');
             socket.on('data', (data) => {
                 this.tasHandler(socket, data);
             });
 
             socket.on('end', () => {
-                Logger.info('[TASConnector-initialize]: TAS socket end');
+                Logger.info('[TASConnector-constructor]: TAS socket end');
                 socket.destroy();
             });
 
             socket.on('close', () => {
-                Logger.info('[TASConnector-initialize]: TAS socket closed');
+                Logger.info('[TASConnector-constructor]: TAS socket closed');
             });
 
             socket.on('error', (error) => {
-                Logger.error(`[TASConnector-initialize]: problem with tcp server: ${error.message}`);
+                Logger.error(`[TASConnector-constructor]: problem with tcp server: ${error.message}`);
                 socket.destroy();
             });
         });
+        this.socketBuffer = {};
+        this.tasBuffer = {};
     }
 
     private async tasHandler(socket: Net.Socket, data: Buffer): Promise<void> {
         const socketId: string = await this.createSocketId();
         this.tasBuffer[socketId] = '';
-
-        Logger.info(`[TASHandler]: Handling data for socket ${socketId} ${socket}`);
         this.tasBuffer[socketId] += data.toString();
+        const dataArray = this.tasBuffer[socketId].split('<EOF>');
+        if(dataArray.length >= 2) {
+            for (let i = 0; i < dataArray.length-1; i++) {
+                const line = dataArray[i];
+                this.tasBuffer[socketId] = this.tasBuffer[socketId].replace(line+'<EOF>', '');
+                const jsonObj = JSON.parse(line);
+                const containerName = jsonObj.containerName;
+                const content = jsonObj.content;
+
+                this.socketBuffer[containerName] = socket;
+                Logger.info(`[TASConnector-tasHandler]: ----> Got data for [${containerName}] from tas <----`);
+
+                if (content === 'hello') {
+                    socket.write(line + '<EOF>');
+                }
+            }
+        }
     }
 
     private async createSocketId(): Promise<string> {

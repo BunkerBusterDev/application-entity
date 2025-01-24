@@ -5,8 +5,13 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 const logger = createLogger({
     level: 'info', // 로그 수준 설정 (error, warn, info, http, verbose, debug, silly)
     format: format.combine(
+        format.colorize(), // 로그에 색상 추가
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // 타임스탬프 추가
-        format.printf(({ timestamp, level, message }) => `[${timestamp}] ${level.toUpperCase()}: ${message}`) // 출력 형식
+        format.printf(({ timestamp, level, message }) => {
+            const logMessage =
+                typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
+            return `[${timestamp}] ${level}: ${logMessage}`;
+        })
     ),
     transports: [
         // 콘솔 출력
