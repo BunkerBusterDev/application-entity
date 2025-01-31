@@ -2,11 +2,11 @@
   "name": "application-entity",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/index.js",
-    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts"
+    "start": "node dist/app.js",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +37,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "mqtt": "^5.10.3",
     "nanoid": "^5.0.9",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
