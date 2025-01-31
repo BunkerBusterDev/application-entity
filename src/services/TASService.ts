@@ -1,6 +1,6 @@
 import Net from 'net';
 import TASHandler from 'handlers/TASHandler';
-import Logger from 'utils/logger';
+import Logger from 'utils/Logger';
 
 class TASService {
     private server: Net.Server;

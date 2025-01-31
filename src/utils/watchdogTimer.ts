@@ -1,66 +1,59 @@
-import events from 'events';
-const watchdogTimer = new events.EventEmitter();
+import Events from 'events';
 
-const watchdogTimerValueQueue: { [key: string]: number } = {};
-const watchdogTickQueue: { [key: string]: number } = {};
-const watchdogCallbackQueue: {
-    [key: string]: (param1: unknown, param2: unknown, param3: unknown) => void;
-} = {};
-const watchdogParam1Queue: { [key: string]: unknown } = {};
-const watchdogParam2Queue: { [key: string]: unknown } = {};
-const watchdogParam3Queue: { [key: string]: unknown } = {};
+type WatchdogCallback = (param1?: any, param2?: any, param3?: any) => void;
 
-setInterval(() => {
-    watchdogTimer.emit('watchdog');
-}, 1000);
+const watchdogTimer = new Events.EventEmitter();
+
+let intervalHandle: NodeJS.Timeout | undefined;
+const timerMap = new Map<string, {sec: number, callback: WatchdogCallback, tick: number, params: [any?, any?, any?]}>();
+
+// 내부에서 1초마다 이벤트 발생
+const startWatchdog = () => {
+    if (!intervalHandle) {
+        intervalHandle = setInterval(() => {
+            watchdogTimer.emit('watchdog');
+        }, 1000);
+    }
+};
+
+const stopWatchdog = () => {
+    if (intervalHandle) {
+        clearInterval(intervalHandle);
+        intervalHandle = undefined;
+    }
+};
 
 watchdogTimer.on('watchdog', () => {
-    for (const id in watchdogTimerValueQueue) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (watchdogTimerValueQueue.hasOwnProperty(id)) {
-            ++watchdogTickQueue[id];
-            if (watchdogTickQueue[id] % watchdogTimerValueQueue[id] === 0) {
-                watchdogTickQueue[id] = 0;
-                if (watchdogCallbackQueue[id]) {
-                    watchdogCallbackQueue[id](
-                        watchdogParam1Queue[id],
-                        watchdogParam2Queue[id],
-                        watchdogParam3Queue[id],
-                    );
-                }
+    for (const [id, timer] of timerMap) {
+        timer.tick++;
+        if (timer.tick % timer.sec === 0) {
+            timer.tick = 0; // tick 초기화
+            try {
+                timer.callback(...timer.params);
+            } catch (error) {
+                console.error(`[Watchdog Error]: Callback for ${id} failed - ${error}`);
             }
         }
     }
 });
 
+// 타이머 설정 함수
 const setWatchdogTimer = (
     id: string,
     sec: number,
-    callbackFunc: () => void,
-    param1?: unknown,
-    param2?: unknown,
-    param3?: unknown,
-): void => {
-    watchdogTimerValueQueue[id] = sec;
-    watchdogTickQueue[id] = 0;
-    watchdogCallbackQueue[id] = callbackFunc;
-    watchdogParam1Queue[id] = param1;
-    watchdogParam2Queue[id] = param2;
-    watchdogParam3Queue[id] = param3;
+    callback: WatchdogCallback,
+    param1?: any,
+    param2?: any,
+    param3?: any
+) => {
+    timerMap.set(id, { sec, callback, tick: 0, params: [param1, param2, param3] });
 };
 
-const getWatchdogTimerCallback = (id: string) => {
-    return watchdogCallbackQueue[id];
-};
-
-const getWatchdogTimerValue = (id: string) => {
-    return watchdogTimerValueQueue[id];
-};
-
+// 타이머 삭제 함수
 const deleteWatchdogTimer = (id: string) => {
-    delete watchdogTimerValueQueue[id];
-    delete watchdogTickQueue[id];
-    delete watchdogCallbackQueue[id];
+    timerMap.delete(id);
 };
 
-export { setWatchdogTimer, getWatchdogTimerCallback, getWatchdogTimerValue, deleteWatchdogTimer };
+const WatchdogTimer = { startWatchdog, stopWatchdog, setWatchdogTimer, deleteWatchdogTimer };
+
+export default WatchdogTimer;

@@ -1,5 +1,5 @@
 import Net from 'net';
-import Logger from 'utils/logger';
+import Logger from 'utils/Logger';
 import { nanoid } from 'nanoid';
 
 class TASHandler {

@@ -1,3 +1,5 @@
+import Logger from "utils/Logger";
+import WatchdogTimer from 'utils/WatchdogTimer';
 
 import TASService from 'services/TASService';
 import IAEHandler from 'handlers/IAEHandler';
@@ -6,7 +8,6 @@ import AEHandlerFactory from 'handlers/AEHandlerFactory';
 import AEService from 'services/AEService';
 import CNTService from 'services/CNTService';
 import SUBService from 'services/SUBService';
-import Logger from "utils/logger";
 
 class App {
     private tasService: TASService
@@ -18,6 +19,8 @@ class App {
     constructor() {
         // SIGINT 처리
         process.on('SIGINT', this.shutdown.bind(this));
+
+        WatchdogTimer.startWatchdog();
 
         // AE 처리
         this.handlerAE = AEHandlerFactory.createHandler('mqtt');
@@ -42,6 +45,7 @@ class App {
     // 애플리케이션 종료
     private async shutdown(): Promise<void> {
         Logger.info('[App-shutdown]: Received SIGINT. Shutting down gracefully...');
+        WatchdogTimer.stopWatchdog();
         process.exit(0);
     }
 }
