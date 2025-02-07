@@ -23,6 +23,10 @@ class HttpHandler implements IAEHandler {
     createSUB(): Promise<void> {
         throw new Error('Method not implemented.');
     }
+    
+    createCIN(): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
 }
 
 export default HttpHandler;

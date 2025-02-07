@@ -131,4 +131,4 @@ dist
 .pnp.*
 
 # conf
-src/conf.ts
+src/Conf.ts

@@ -50,6 +50,13 @@ class MqttHandler implements IAEHandler {
 
         console.log(`Publishing to topic: ${topic}, message: ${message}`);
     }
+
+    async createCIN(): Promise<void> {
+        const topic: string = 'createCIN';
+        const message: string = JSON.stringify({ action: 'createCIN', data: { topic: 'exampleTopic' } });
+
+        console.log(`Publishing to topic: ${topic}, message: ${message}`);
+    }
 }
 
 export default MqttHandler;

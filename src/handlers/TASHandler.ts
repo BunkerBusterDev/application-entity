@@ -1,22 +1,14 @@
 import Net from 'net';
-import Logger from 'utils/Logger';
 import { nanoid } from 'nanoid';
+import Config from 'Conf';
+import Logger from 'utils/Logger';
 
 class TASHandler {
     private socketBuffer: Record<string, Net.Socket> = {};
     private tasBuffer: Record<string, string> = {};
 
-    public async handleConnection(socket: Net.Socket): Promise<void> {
-        Logger.info('[TASHandler-handleConnection]: TAS connected');
-
-        socket.on('data', (data) => this.handleData(socket, data));
-        socket.on('end', () => this.handleEnd(socket));
-        socket.on('close', () => this.handleClose());
-        socket.on('error', (error) => this.handleError(socket, error));
-    }
-
-    private async handleData(socket: Net.Socket, data: Buffer): Promise<void> {
-        const socketId = await this.createSocketId();
+    public async handleData(createCIN: Function, socket: Net.Socket, data: Buffer): Promise<void> {
+        const socketId = nanoid();
         if (!this.tasBuffer[socketId]) this.tasBuffer[socketId] = '';
 
         this.tasBuffer[socketId] += data.toString();
@@ -28,39 +20,33 @@ class TASHandler {
                 this.tasBuffer[socketId] = this.tasBuffer[socketId].replace(lineData + '<EOF>', '');
 
                 try {
-                    const jsonObj = JSON.parse(lineData);
-                    const name = jsonObj.name;
-                    const content = jsonObj.content;
+                    const jsonObject = JSON.parse(lineData);
+                    const containerName = jsonObject.name;
+                    const containerContent = jsonObject.content;
 
-                    this.socketBuffer[name] = socket;
-                    Logger.info(`[TASHandler-handleData]: Got data for [${name}] from TAS`);
+                    this.socketBuffer[containerName] = socket;
+                    Logger.info(`[TASHandler-handleData]: Got data for [${containerName}] from TAS`);
 
-                    if (content === 'hello') {
-                        socket.write(lineData + '<EOF>');
+                    if (containerContent === 'hello') {
+                        socket.write(`${lineData}<EOF>`);
+                    }
+                    else {
+                        if (Config.applicationEntity.state === 'createtContentInstance') {
+                            for (var j = 0; j < Config.containerArray.length; j++) {
+                                if (Config.containerArray[j].name === containerName) {
+                                    //console.log(line);
+                                    // const parent = Config.containerArray[j].parent + '/' + Config.containerArray[j].name;
+                                    await createCIN();
+                                    break;
+                                }
+                            }
+                        }
                     }
                 } catch (error) {
                     Logger.error(`[TASHandler-handleData]: Failed to parse data: ${lineData}`);
                 }
             }
         }
-    }
-
-    private handleEnd(socket: Net.Socket): void {
-        Logger.info('[TASHandler-handleEnd]: TAS socket end');
-        socket.destroy();
-    }
-
-    private handleClose(): void {
-        Logger.info('[TASHandler-handleClose]: TAS socket closed');
-    }
-
-    private handleError(socket: Net.Socket, error: Error): void {
-        Logger.error(`[TASHandler-handleError]: problem with TCP server: ${error.message}`);
-        socket.destroy();
-    }
-
-    private async createSocketId(): Promise<string> {
-        return nanoid();
     }
 }
 

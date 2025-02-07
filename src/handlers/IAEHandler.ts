@@ -4,4 +4,5 @@ export default interface IAEHandler {
     createCNT(): Promise<void>;
     deleteSUB(): Promise<void>;
     createSUB(): Promise<void>;
+    createCIN(): Promise<void>;
 }

@@ -3,6 +3,7 @@ const commonServiceEntity = {
     id: '/CommonServiceEntity',
     name: 'CommonServiceEntity',
     host: 'ip',
+    useProtocol: 'mqtt',
     port: 7579,
     mqttPort: 1883,
 };
@@ -10,6 +11,7 @@ const commonServiceEntity = {
 // build applicationEntity
 const aeName = 'SensingAE';
 const applicationEntity = {
+    state: '',
     parent: `/${commonServiceEntity.name}`,
     name: `${aeName}`,
     id: `S${aeName}`,
@@ -97,7 +99,6 @@ const subscriptionArray: Array<iSubscriptionArray> = [];
 // }
 
 const config = {
-    useProtocol: 'mqtt',
     commonServiceEntity: commonServiceEntity,
     applicationEntity: applicationEntity,
     containerArray: containerArray,
