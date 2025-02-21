@@ -54,6 +54,17 @@ const deleteWatchdogTimer = (id: string) => {
     timerMap.delete(id);
 };
 
-const WatchdogTimer = { startWatchdog, stopWatchdog, setWatchdogTimer, deleteWatchdogTimer };
+// 타미어 전체 삭제 함수
+const deleteAllWatchdogTimer = () => {
+    timerMap.clear();
+}
 
-export default WatchdogTimer;
+const WatchdogTimer = {
+    startWatchdog: startWatchdog,
+    stopWatchdog: stopWatchdog,
+    setWatchdogTimer: setWatchdogTimer,
+    deleteWatchdogTimer: deleteWatchdogTimer,
+    deleteAllWatchdogTimer: deleteAllWatchdogTimer
+};
+
+export = WatchdogTimer;

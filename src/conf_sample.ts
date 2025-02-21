@@ -11,7 +11,7 @@ const commonServiceEntity = {
 // build applicationEntity
 const aeName = 'SensingAE';
 const applicationEntity = {
-    state: '',
+    state: 'createAE',
     parent: `/${commonServiceEntity.name}`,
     name: `${aeName}`,
     id: `S${aeName}`,
@@ -29,6 +29,7 @@ interface iConatinerArray {
 }
 const containerArray: Array<iConatinerArray> = [];
 
+// in SensingAE
 let count = 0;
 containerArray[count++] = {
     parent: `/${commonServiceEntity.name}/${applicationEntity.name}`,
@@ -76,22 +77,31 @@ containerArray[count++] = {
 //     };
 // }
 
+
+// in ControlAE
+// const numLED = 5;
+// for (let i = 0; i < numLED; i++) {
+//     containerArray[count+i] = {
+//         parent: `/${commonServiceEntity.name}/${applicationEntity.name}`,
+//         name: `container_led_${i + 1}`,
+//     };
+// }
+
 // build subscription
 interface iSubscriptionArray extends iConatinerArray {
     nu: string;
 }
 const subscriptionArray: Array<iSubscriptionArray> = [];
-// count = 0;
 // for (let i = 0; i < numLED; i++) {
-//     if (useProtocol === 'http') {
-//         subscriptionArray[count] = {
-//             parent: `/${commonServiceEntity.name}/${applicationEntity.name}/${containerArray[count++].name}`,
+//     if (commonServiceEntity.useProtocol === 'http') {
+//         subscriptionArray[i] = {
+//             parent: `/${commonServiceEntity.name}/${applicationEntity.name}/${containerArray[count+i].name}`,
 //             name: `subscription_led_${i + 1}`,
 //             nu: `http://${applicationEntity.ip}:${applicationEntity.port}/noti?ct=json`,
 //         };
-//     } else if (useProtocol === 'mqtt') {
-//         subscriptionArray[count] = {
-//             parent: `/${commonServiceEntity.name}/${applicationEntity.name}/${containerArray[count++].name}`,
+//     } else if (commonServiceEntity.useProtocol === 'mqtt') {
+//         subscriptionArray[i] = {
+//             parent: `/${commonServiceEntity.name}/${applicationEntity.name}/${containerArray[count+i].name}`,
 //             name: `subscription_led_${i + 1}`,
 //             nu: `mqtt://${commonServiceEntity.host}/${applicationEntity.id}?ct=${applicationEntity.bodyType}`,
 //         };

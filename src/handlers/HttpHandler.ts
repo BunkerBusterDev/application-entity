@@ -4,28 +4,35 @@ class HttpHandler implements IAEHandler {
     constructor() {
     }
 
-    createAE(): Promise<void> {
+    public aeResponseAction() {
         throw new Error('Method not implemented.');
     }
 
-    retrieveAE(): Promise<void> {
+    startCSEConnector(): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
-    createCNT(): Promise<void> {
+    createAE() {
         throw new Error('Method not implemented.');
     }
 
-    deleteSUB(): Promise<void> {
+    retrieveAE() {
+        throw new Error('Method not implemented.');
+    }
+
+    createCNT() {
+        throw new Error('Method not implemented.');
+    }
+
+    deleteSUB() {
         throw new Error('Method not implemented.');
     }
     
-    createSUB(): Promise<void> {
+    createSUB() {
         throw new Error('Method not implemented.');
     }
     
-    createCIN(): Promise<void> {
-        throw new Error('Method not implemented.');
+    createCIN() {
     }
 }
 

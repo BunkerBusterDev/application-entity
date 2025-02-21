@@ -1,39 +1,27 @@
-import Net from 'net';
-import TASHandler from 'handlers/TASHandler';
 import Logger from 'utils/Logger';
+import TASHandler from 'handlers/TASHandler';
 
 class TASService {
-    private server: Net.Server;
     private tasHandler: TASHandler;
 
     constructor(private createCIN: Function) {
-        this.tasHandler = new TASHandler();
-        this.server = Net.createServer((socket: Net.Socket) => this.setupSocket(socket));
+        this.tasHandler = new TASHandler(this.createCIN);
     }
 
-    private setupSocket(socket: Net.Socket) {
-        Logger.info('[TASService-setupSocket]: TasConnecotr is set up');
-        socket.on('data', (data) => this.tasHandler.handleData(this.createCIN, socket, data));
-        socket.on('end', () => {    
-            Logger.info('[TASHandler-handleEnd]: TAS socket end');
-            socket.destroy();
-        });
-        socket.on('close', () => {
-            Logger.info('[TASHandler-handleClose]: TAS socket closed');
-        });
-        socket.on('error', (error) => {
-            Logger.error(`[TASHandler-handleError]: problem with TCP server: ${error.message}`);
-            socket.destroy();
-        });
-    }
-
-    public async start(tasPort: number): Promise<void> {
-        return new Promise((resolve) => {
-            this.server.listen(tasPort, () => {
-                Logger.info(`[TASService-start]: TCP Server for TAS is listening on port ${tasPort}`);
-                resolve();
-            });
-        });
+    /**
+     * TCP 서버를 실행합니다.
+     *
+     * @returns Promise<string> (서버가 실행되면 'startUpload' resolve)
+     */
+    public async startTASConnector(): Promise<string> {
+        try {
+            Logger.info('[TASService-startTASConnector]: Running business logic for starting TASConnector...');
+            await this.tasHandler.startTASConnector();
+            Logger.info('[TASService-startTASConnector]: TASConnector started successfully');
+            return 'createtContentInstance';
+        } catch (error) {
+            return 'startTASConnector'
+        }
     }
 }
 
