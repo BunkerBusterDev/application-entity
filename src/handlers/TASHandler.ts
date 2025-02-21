@@ -69,6 +69,23 @@ class TASHandler {
         }
     }
 
+    public notification (pathArray: string[], cinObj: any): void {
+        const contentInstance = {
+            name: pathArray[pathArray.length-2],
+            content: (cinObj.con !== null) ? cinObj.con : cinObj.content
+        };
+
+        if(contentInstance.content === '') {
+            Logger.error('[TASHandler-notification]: is not cin message');
+        } else {
+            Logger.info('[TASHandler-notification]: send to tas');
+
+            if(this.socketBuffer[pathArray[pathArray.length-2]] !== null) {
+                this.socketBuffer[pathArray[pathArray.length-2]].write(`${JSON.stringify(contentInstance)}<EOF>`);
+            }
+        }
+    }
+
     public async startTASConnector(): Promise<void> {
         return new Promise((resolve) => {
             this.server.listen(applicationEntity.tasPort, () => {

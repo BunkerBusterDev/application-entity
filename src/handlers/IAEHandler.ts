@@ -1,8 +1,10 @@
 import Net from 'net';
 
 export default interface IAEHandler {
-    aeResponseAction(responseStatusCode: number, primitiveContent: any): void ;
+    aeResponseAction(responseStatusCode: number, primitiveContent: any): void;
+    notificationAction(topicArray: Array<string>, jsonObj: any): void;
     startCSEConnector(): Promise<void>;
+    setTASNotificationFunction(tasNotification: Function): void;
     createAE(callback: Function): void;
     retrieveAE(callback: Function): void;
     createCNT(parent: string, name: string, callback: Function): void;

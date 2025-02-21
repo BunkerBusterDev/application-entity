@@ -23,6 +23,10 @@ class TASService {
             return 'startTASConnector'
         }
     }
+
+    public notification(pathArray: string[], cinObj: any) {
+        this.tasHandler.notification(pathArray, cinObj);
+    }
 }
 
 export default TASService;

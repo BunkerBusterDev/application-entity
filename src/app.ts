@@ -42,8 +42,9 @@ class App {
 
         // TAS 처리
         this.tasService = new TASService(this.cinService.createCIN.bind(this.cinService));
+        this.handlerAE.setTASNotificationFunction(this.tasService.notification.bind(this.tasService));
 
-        this.maxRetries = 5;
+        this.maxRetries = 10;
         this.retryCount = 0;
         this.delayTime = 1000;
     }

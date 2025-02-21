@@ -4,11 +4,19 @@ class HttpHandler implements IAEHandler {
     constructor() {
     }
 
-    public aeResponseAction() {
+    aeResponseAction() {
+        throw new Error('Method not implemented.');
+    }
+
+    notificationAction(): void {
         throw new Error('Method not implemented.');
     }
 
     startCSEConnector(): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
+    setTASNotificationFunction(): void {
         throw new Error('Method not implemented.');
     }
 
